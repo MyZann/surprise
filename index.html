@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadiah Rahasia Untukmu!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', 'Inter', sans-serif; /* Menggunakan Poppins sebagai font utama */
+            background: linear-gradient(135deg, #000000, #333333); /* Gradien hitam ke abu-abu gelap */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        /* Styling untuk tampilan utama (hadiah) */
+        .container {
+            /* Menghilangkan background, padding, border, shadow untuk tampilan simple */
+            background-color: transparent; /* Transparan */
+            padding: 0; /* Tidak ada padding */
+            border-radius: 0; /* Tidak ada border-radius */
+            box-shadow: none; /* Tidak ada shadow */
+            border: none; /* Tidak ada border */
+
+            text-align: center;
+            max-width: 90%;
+            width: 550px;
+            position: relative;
+            z-index: 10;
+            transform: scale(1);
+            transition: transform 0.3s ease-in-out;
+            /* Pastikan flexbox tetap untuk centering */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container:hover {
+            transform: scale(1); /* Menghilangkan efek zoom pada hover untuk kesederhanaan */
+        }
+        .gift-box {
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            animation: bounce 2s infinite; /* Animasi memantul tetap ada */
+        }
+        .gift-box:hover {
+            transform: scale(1.1); /* Efek scale lebih besar pada hover */
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.6); /* Bayangan merah pada hover */
+        }
+        .jumpscare-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%; /* Pastikan overlay mengisi seluruh lebar */
+            height: 100%; /* Pastikan overlay mengisi seluruh tinggi */
+            background-color: black;
+            display: flex;
+            flex-direction: column; /* Mengatur tata letak vertikal untuk video dan teks */
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .jumpscare-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .jumpscare-video {
+            width: 100%; /* Video akan mengisi lebar overlay */
+            height: 100%; /* Video akan mengisi tinggi overlay */
+            object-fit: cover; /* Pastikan video menutupi seluruh area tanpa distorsi */
+        }
+        .jumpscare-message {
+            color: white;
+            font-size: 3rem; /* Ukuran font besar untuk pesan */
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Efek glow pada teks */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out;
+            z-index: 101; /* Pastikan di atas video */
+            margin-top: 1rem; /* Spasi antar pesan */
+            text-align: center; /* Pastikan teks di tengah */
+        }
+        .jumpscare-message.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1.5rem; /* Spasi antar tombol */
+            margin-top: 2rem; /* Spasi dari pesan terakhir */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out;
+            z-index: 101;
+        }
+        .action-buttons.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .action-button {
+            padding: 1rem 2.5rem;
+            border-radius: 9999px; /* Full rounded */
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .button-kaget {
+            background: linear-gradient(45deg, #ef4444, #dc2626); /* Merah */
+        }
+        .button-tidak {
+            background: linear-gradient(45deg, #22c55e, #16a34a); /* Hijau */
+        }
+
+        /* Styling for the new name input screen */
+        .name-input-container {
+            /* Menghilangkan background, padding, border, shadow untuk tampilan simple */
+            background-color: transparent; /* Transparan */
+            padding: 0; /* Tidak ada padding */
+            border-radius: 0; /* Tidak ada border-radius */
+            box-shadow: none; /* Tidak ada shadow */
+            border: none; /* Tidak ada border */
+
+            text-align: center;
+            max-width: 90%;
+            width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .name-input-field {
+            background-color: rgba(255, 255, 255, 0.2); /* Putih transparan */
+            color: white;
+            border: 1px solid white; /* Border putih */
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 1.25rem;
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 1.5rem;
+            outline: none;
+            text-align: center; /* Teks input di tengah */
+        }
+        .name-input-field::placeholder {
+            color: #cccccc; /* Placeholder abu-abu terang */
+        }
+        .name-submit-button {
+            background: linear-gradient(45deg, #ffffff, #cccccc); /* Gradien putih ke abu-abu terang */
+            color: black; /* Teks hitam */
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .name-submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal / Pop-up Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Latar belakang semi-transparan */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200; /* Di atas semua elemen lain */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #333333; /* Warna gelap */
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            max-width: 80%;
+        }
+        .modal-close-button {
+            background-color: #ef4444; /* Merah */
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .modal-close-button:hover {
+            background-color: #dc2626; /* Merah lebih gelap */
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Wobble animation for the emoji */
+        @keyframes wobble {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            15% { transform: translateX(-5px) rotate(-3deg); }
+            30% { transform: translateX(5px) rotate(3deg); }
+            45% { transform: translateX(-5px) rotate(-3deg); }
+            60% { transform: translateX(5px) rotate(3deg); }
+            75% { transform: translateX(-2px) rotate(-1deg); }
+            90% { transform: translateX(2px) rotate(1deg); }
+        }
+        .animate-wobble {
+            animation: wobble 2s ease-in-out infinite; /* Apply wobble animation */
+        }
+    </style>
+</head>
+<body>
+    <div id="nameInputScreen" class="name-input-container">
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-md">Halo Annonymous!</h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-8">Masukkan namamu untuk membuka kejutan!</p>
+        <input type="text" id="userNameInput" class="name-input-field" placeholder="Nama Lengkapmu...">
+        <button id="submitNameButton" class="name-submit-button">Lanjutkan</button>
+    </div>
+
+    <div id="initial-content" class="container hidden">
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-md">Halo, <span id="userNameDisplay"></span></h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-8">Ada kejutan spesial untukmu</p>
+        <span class="text-9xl mb-8 animate-wobble">🎁</span>
+        <div id="giftBox" class="gift-box bg-gradient-to-r from-white to-gray-300 text-black font-bold py-5 px-10 rounded-full shadow-xl flex items-center justify-center text-2xl md:text-3xl transform hover:scale-110 transition-all duration-300 ease-in-out">
+            <svg class="w-10 h-10 mr-4 text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.293 9.293a1 1 0 011.414 0L12 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Buka Kejutan Ini!
+        </div>
+    </div>
+
+    <div id="jumpscareOverlay" class="jumpscare-overlay">
+        <video id="jumpscareVideo" class="jumpscare-video" preload="auto">
+            <source src="https://cdn.vlipsy.com/clips/3hEsFXt9/480p-watermark.mp4?token=v1_f_1747885500_XQEs7khRl" type="video/mp4">
+            Maaf, browser Anda tidak mendukung tag video.
+        </video>
+        <div id="jumpscareMessage1" class="jumpscare-message">
+            Beneran kejutan kan?
+        </div>
+        <div id="jumpscareMessage2" class="jumpscare-message">
+            Selamat atas kejutannya!
+        </div>
+        <div id="jumpscareMessage3" class="jumpscare-message">
+            Dari Hirzan Al Hafiz
+        </div>
+
+        <div id="actionButtons" class="action-buttons">
+            <button id="buttonKaget" class="action-button button-kaget">Kaget</button>
+            <button id="buttonTidak" class="action-button button-tidak">Tidak</button>
+        </div>
+    </div>
+
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modalMessage"></p>
+            <button id="modalCloseButton" class="modal-close-button">OKE</button>
+        </div>
+    </div>
+
+    <script>
+        const nameInputScreen = document.getElementById('nameInputScreen');
+        const userNameInput = document.getElementById('userNameInput');
+        const submitNameButton = document.getElementById('submitNameButton');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+
+        const giftBox = document.getElementById('giftBox');
+        const initialContent = document.getElementById('initial-content');
+        const jumpscareOverlay = document.getElementById('jumpscareOverlay');
+        const jumpscareVideo = document.getElementById('jumpscareVideo');
+        const jumpscareMessage1 = document.getElementById('jumpscareMessage1');
+        const jumpscareMessage2 = document.getElementById('jumpscareMessage2');
+        const jumpscareMessage3 = document.getElementById('jumpscareMessage3');
+        const actionButtons = document.getElementById('actionButtons');
+        const buttonKaget = document.getElementById('buttonKaget');
+        const buttonTidak = document.getElementById('buttonTidak');
+
+        // Modal elements
+        const customModal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        // Nomor WhatsApp tujuan
+        const whatsappNumber = '6285860881269'; // Format internasional tanpa '+'
+
+        // Fungsi untuk menampilkan modal
+        function showModal(message) {
+            modalMessage.textContent = message;
+            customModal.classList.add('active');
+        }
+
+        // Fungsi untuk menyembunyikan modal
+        function hideModal() {
+            customModal.classList.remove('active');
+        }
+
+        // Event listener untuk tombol tutup modal
+        modalCloseButton.addEventListener('click', hideModal);
+
+        // Pastikan video dimuat dan siap diputar
+        jumpscareVideo.load();
+
+        // Logika untuk validasi nama dan layar input nama
+        submitNameButton.addEventListener('click', () => {
+            let userName = userNameInput.value.trim(); // Ambil nama dan hapus spasi di awal/akhir
+
+            // Regex untuk memeriksa apakah nama hanya mengandung huruf, spasi, dan beberapa tanda baca umum
+            // Minimum 3 karakter, maksimum 50 karakter
+            const nameRegex = /^[a-zA-Z\s.'-]{3,50}$/;
+            // Regex untuk mendeteksi karakter yang sama berulang 3 kali atau lebih (indikasi gibberish)
+            const repeatingCharRegex = /(.)\1{2,}/;
+
+            if (userName === '') {
+                showModal('Yaelah masa gapunya nama sih'); // Pop-up jika nama kosong
+            } else if (userName.length < 3) {
+                showModal('Namamu pendek banget kaya tinggimu'); // Pop-up jika nama terlalu pendek
+            } else if (repeatingCharRegex.test(userName) || !nameRegex.test(userName)) {
+                // Jika mengandung karakter berulang ATAU tidak sesuai regex (misal ada angka/simbol aneh)
+                showModal('Yaelah system buatan gw mau lu bodoh bodohin, masukin nama yang bener ege'); // Pop-up jika nama tidak logis
+            }
+            else {
+                userNameDisplay.textContent = userName; // Masukkan nama ke span di judul
+                nameInputScreen.classList.add('hidden'); // Sembunyikan layar input nama
+                initialContent.classList.remove('hidden'); // Tampilkan konten utama
+            }
+        });
+
+        // Logika untuk gift box dan jumpscare (tetap sama)
+        giftBox.addEventListener('click', () => {
+            initialContent.classList.add('hidden');
+            jumpscareOverlay.classList.add('active');
+
+            jumpscareVideo.play().catch(error => {
+                console.error("Error playing video:", error);
+            });
+
+            jumpscareVideo.onended = () => {
+                jumpscareVideo.style.display = 'none';
+                jumpscareMessage1.classList.add('active');
+
+                setTimeout(() => {
+                    jumpscareMessage2.classList.add('active');
+                    setTimeout(() => {
+                        jumpscareMessage3.classList.add('active');
+                        setTimeout(() => {
+                            actionButtons.classList.add('active');
+                        }, 1000);
+                    }, 2000);
+                }, 2000);
+            };
+        });
+
+        // Event listener untuk tombol "Kaget"
+        buttonKaget.addEventListener('click', () => {
+            const userName = userNameDisplay.textContent; // Ambil nama yang sudah ditampilkan
+            const message = encodeURIComponent(`Halo Hirzan, ${userName} kaget banget! Prankmu berhasil!`);
+            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+        });
+
+        // Event listener untuk tombol "Tidak"
+        buttonTidak.addEventListener('click', () => {
+            const userName = userNameDisplay.textContent; // Ambil nama yang sudah ditampilkan
+            const message = encodeURIComponent(`Halo Hirzan, ${userName} tidak kaget. Prankmu kurang berhasil!`);
+            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+        });
+    </script>
+</body>
+</html>
