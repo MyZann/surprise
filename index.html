@@ -75,6 +75,9 @@
             width: 100%; /* Video akan mengisi lebar overlay */
             height: 100%; /* Video akan mengisi tinggi overlay */
             object-fit: cover; /* Pastikan video menutupi seluruh area tanpa distorsi */
+            position: absolute; /* Added for full coverage */
+            top: 0; /* Added for full coverage */
+            left: 0; /* Added for full coverage */
         }
         .jumpscare-message {
             color: white;
@@ -242,7 +245,7 @@
 </head>
 <body>
     <div id="nameInputScreen" class="name-input-container">
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-md">Halo Annonymous!</h1>
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-md">Halo, Anonym!</h1>
         <p class="text-xl md:text-2xl text-gray-300 mb-8">Masukkan namamu untuk membuka kejutan!</p>
         <input type="text" id="userNameInput" class="name-input-field" placeholder="Nama Lengkapmu...">
         <button id="submitNameButton" class="name-submit-button">Lanjutkan</button>
